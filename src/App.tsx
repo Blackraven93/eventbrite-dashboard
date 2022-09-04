@@ -1,24 +1,40 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
-function App() {
+interface IEvent {
+  attendees:IAttendee
+}
+interface IAttendee {
+  costs:string
+  resource_uri: string
+  barcodes: string
+  answers: string
+}
+
+const App = () => {
+
+  const reponseAttendees = async ():Promise<IEvent> => {
+    return await fetch(`${process.env.REACT_APP_URL}/${process.env.REACT_APP_EVENT_ID}/${process.env.REACT_APP_CATEGORY}/?status=attending`, {
+      method: 'GET', 
+      headers: {
+        'Content-Type': 'application/json',
+        "Authorization": `Bearer ${process.env.REACT_APP_TOKEN}`,
+        "Host": process.env.REACT_APP_REQUEST_URL
+      },
+    })
+    .then((response) => response.json())
+    .catch((error) => {
+      console.error('실패:', error);
+    })
+  }
+  
+  const value = reponseAttendees()
+  const { attendees } = value
+  const [attendee, setAttendee] = useState(attendees)
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {attendee}
     </div>
   );
 }
